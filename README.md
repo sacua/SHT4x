@@ -9,35 +9,27 @@
 [![PlatformIO Registry](https://badges.registry.platformio.org/packages/robtillaart/library/SHT31.svg)](https://registry.platformio.org/libraries/robtillaart/SHT31)
 
 
-# SHT31
+# SHT4x
 
-Arduino library for the SHT31 temperature and humidity sensor.
-
-Relates to the SHT85 library - https://github.com/RobTillaart/SHT85
+Arduino library for the SHT4x temperature and humidity sensor.
 
 
 ## Description
 
-The SHT3x family of sensors should work up to 1 MHz I2C.
-
-This library should also work for SHT30 and SHT35 but these are
-not tested yet.
+The SHT4x family of sensors should work up to 1 MHz I2C. **NOT VALIDATED!**
 
 Accuracy table
 
-|  Sensor  |  Temperature  |  Humidity  |  Verified  }
-|:--------:|:-------------:|:----------:|:----------:|
-|   SHT30  |      ~0.3°    |     2.0%   |     N      |
-|   SHT31  |      ~0.3°    |     1.5%   |     Y      |
-|   SHT35  |      ~0.2°    |     1.5%   |     N      |
-|   SHT85  |      ~0.2°    |     1.5%   |     Y      |
+|  Sensor  |  Temperature   |  Humidity  |  Verified 
+|:--------:|:--------------:|:----------:|:----------:|
+|   SHT40  |      ~0.2Â°C    |     1.8%   |     N      |
+|   SHT41  |      ~0.2Â°C    |     1.8%   |     N      |
+|   SHT43  |      ISO Cal   |     1.8%   |     N      |
+|   SHT45  |      ~0.1Â°C    |     1.0%   |     N      |
 
 
-An elaborated library for the SHT31 sensor can be found here
-- https://github.com/hawesg/SHT31D_Particle_Photon_ClosedCube
-
-A derived class for using the SHT31 sensor with SoftWire (soft I2C) can be found here
-- https://github.com/RobTillaart/SHT31_SW
+An elaborated library for the SHT4x sensor can be found here
+- https://github.com/Sensirion/arduino-i2c-sht4x
 
 
 ### I2C multiplexing
@@ -56,15 +48,6 @@ Also note that switching between channels will slow down other devices
 too if they are behind the multiplexer.
 
 - https://github.com/RobTillaart/TCA9548
-
-
-### 0.5.0 Breaking change
-
-Version 0.5.0 introduced a breaking change.
-You cannot set the pins in **begin()** any more.
-This reduces the dependency of processor dependent Wire implementations.
-The user has to call **Wire.begin()** and can optionally set the Wire pins 
-before calling **begin()**.
 
 
 ### Related
@@ -98,12 +81,12 @@ Other, including Dewpoint, heatindex, related functions and conversions.
 ## Interface
 
 ```cpp
-#include "SHT31.h"
+#include "SHT4x.h"
 ```
 
 ### Constructor
 
-- **SHT31(uint8_t address = SHT_DEFAULT_ADDRESS, TwoWire \*wire = &Wire)** constructor. 
+- **SHT4x(uint8_t address = SHT_DEFAULT_ADDRESS, TwoWire \*wire = &Wire)** constructor. 
 Optional select address and the I2C bus (Wire, Wire1 etc).
 - **bool begin()** 
 Returns false if device address is incorrect or device cannot be reset.
@@ -113,21 +96,28 @@ Returns false if device address is incorrect or device cannot be reset.
 
 ### Read
 
-- **bool read(bool fast = true)** blocks 4 (fast) or 15 (slow) milliseconds + actual read + math.
-Does read both the temperature and humidity.
+- **bool read(uint8_t measurementType = SHT4x_MEASUREMENT_SLOW, bool errorCheck = true)** 
+  - **SHT4x_MEASUREMENT_SLOW** : High precision measurement
+  - **SHT4x_MEASUREMENT_MEDIUM** : Medium precision measurement
+  - **SHT4x_MEASUREMENT_FAST** : Low precision measurement
+  - **SHT4x_MEASUREMENT_LONG_HIGH_HEAT** : activate heater with 200mW for 1s including a high precision measurement just before deactivation
+  - **SHT4x_MEASUREMENT_SHORT_HIGH_HEAT** : activate heater with 200mW for 0.1s including a high precision measurement just before deactivation
+  - **SHT4x_MEASUREMENT_LONG_MEDIUM_HEAT** :activate heater with 110mW for 1s including a high precision measurement just before deactivation
+  - **SHT4x_MEASUREMENT_SHORT_MEDIUM_HEAT** :activate heater with 110mW for 0.1s including a high precision measurement just before deactivation
+  - **SHT4x_MEASUREMENT_LONG_LOW_HEAT** :activate heater with 20mW for 1s including a high precision measurement just before deactivation
+  - **SHT4x_MEASUREMENT_SHORT_LOW_HEAT** :activate heater with 20mW for 0.1s including a high precision measurement just before deactivation
+  - **errorCheck**: errorCheck = true does the CRC check. Returns false if reading fails or in case of a CRC failure. Equivalent to fast = false in the SHT31 library. 
 
 Meta information about the sensor.
 
-- **uint16_t readStatus()** returns bit mask, details see **Status fields** below (and datasheet).
-- **bool clearStatus()** clear status register, see **Status fields** below.
 - **uint32_t lastRead()** in milliSeconds since start of program.
-- **bool reset(bool hard = false)** resets the sensor, soft reset by default. Returns false if call fails.
+- **bool reset()** resets the sensor, soft reset by default. Returns false if call fails.
 
 The following functions will return the same value until a new **read()** call (or async) is made.
 
 - **float getHumidity()** computes the relative humidity in % based on the latest raw reading, and returns it.
-- **float getTemperature()** computes the temperature in °C based on the latest raw reading, and returns it.
-- **float getFahrenheit()** computes the temperature in °F based on the latest raw reading, and returns it..
+- **float getTemperature()** computes the temperature in ï¿½C based on the latest raw reading, and returns it.
+- **float getFahrenheit()** computes the temperature in ï¿½F based on the latest raw reading, and returns it..
 
 
 The **getRawHumidity()** and **getRawTemperature()** can be used to minimize storage or communication as the data type is 50% smaller.
@@ -162,92 +152,35 @@ any command as the error flag could be from a previous command.
 |  0x89   |  SHT31_ERR_HEATER_ON          |  Could not switch on heater    |
 |  0x8A   |  SHT31_ERR_SERIAL_NUMBER_CRC  |  Could not switch on heater    |
 
-
-### Heater interface
-
-**WARNING:** Do not use heater for long periods. 
-
-Use the heater for max **180** seconds, and let it cool down **180** seconds = 3 minutes. 
-Version 0.3.3 and up guards the cool down time by preventing switching the heater on 
-within **180** seconds of the last switch off. Note: this guarding is not reboot persistent. 
-
-**WARNING:** The user is responsible to switch the heater off manually!
-
-The class does **NOT** do this automatically.
-Switch off the heater by explicitly calling **heatOff()** or indirectly by calling **isHeaterOn()**.
-
-- **void setHeatTimeout(uint8_t seconds)** Set the time out of the heat cycle.
-This value is truncated to max 180 seconds. 
-- **uint8_t getHeatTimeout()** returns the value set.
-- **bool heatOn()** switches the heat cycle on if not already on.
-Returns false if the call fails, setting error to **SHT31_ERR_HEATER_COOLDOWN** 
-or to **SHT31_ERR_HEATER_ON**. 
-- **bool heatOff()** switches the heat cycle off. 
-Returns false if fails, setting error to **SHT31_ERR_HEATER_OFF**.
-- **bool isHeaterOn()** is the sensor still in a heating cycle? Replaces **heatUp()**.
-Will switch the heater off if maximum heating time has passed.
-
-
 ### Async interface
 
 See async example for usage
 
-- **bool requestData()** requests a new measurement. Returns false if this fails.
-- **bool dataReady()** checks if enough time has passed to read the data. (15 milliseconds)
-- **bool readData(bool fast = true)** fast = true skips the CRC check. 
-Returns false if reading fails or in case of a CRC failure. 
-
-
-## Status fields
-
-|  BIT  |  Description                 |  value  |  notes  |
-|:------|:-----------------------------|:--------|:--------|
-|  15   |  Alert pending status        |  0      | no pending alerts
-|       |                              |  1      | at least one pending alert - default
-|  14   |  Reserved                    |  0      |
-|  13   |  Heater status               |  0      | Heater OFF - default
-|       |                              |  1      | Heater ON 
-|  12   |  Reserved                    |  0      |
-|  11   |  Humidity tracking alert     |  0      | no alert - default
-|       |                              |  1      | alert
-|  10   |  Temperature tracking alert  |  0      | no alert - default
-|       |                              |  1      | alert
-|  9-5  |  Reserved                    |  00000  | reserved
-|   4   |  System reset detected       |  0      | no reset since last ‘clear status register’ command
-|       |                              |  1      | reset detected (hard or soft reset command or supply fail) - default
-|  3-2  |  Reserved                    |  00     |
-|   1   |  Command status              |  0      | last command executed successfully
-|       |                              |  1      | last command not processed. Invalid or failed checksum
-|   0   |  Write data checksum status  |  0      | checksum of last write correct
-|       |                              |  1      | checksum of last write transfer failed
-
-**bool clearStatus()** clears 15, 11, 10 and 4.
+- **bool requestData(uint8_t measurementType = SHT4x_MEASUREMENT_SLOW)** requests a new measurement. Returns false if this fails. See read() for the possible input.
+- **bool dataReady()** checks if enough time has passed to read the data.
+- **bool readData(bool errorCheck = true)** errorCheck = true does the CRC check. Returns false if reading fails or in case of a CRC failure. Equivalent to fast = false in the SHT31 library. 
 
 
 ### GetSerial
 
-- **bool getSerialNumber(uint32_t &serial, bool fast = true)** fast == true, => no CRC check
-fast == false, => do CRC check. 
+- **bool getSerialNumber(uint32_t &serial, bool errorCheck = true)** errorCheck == true, => CRC check, slower
+errorCheck == false, => no CRC check, faster. 
 
 
 ## Future
 
 #### Must
 
-- improve documentation.
-  - reorder interface
-- keep in sync with SHT85 library.
-- keep derived SHT31_SW builds green
+- Validate and compile
 
 #### Should
 
-- check TODO in code.
-- rename MAGIC numbers.  e.g. in dataReady()
+- Validate the I2C speed
+
 
 #### Could
 
 - move code from .h to .cpp
-- param fast in getSerialNumber => skipCRC?
 
 
 #### Wont

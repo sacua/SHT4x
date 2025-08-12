@@ -57,7 +57,7 @@ uint8_t SHT4x::getAddress()
 }
 
 
-bool SHT4x::read(uint8_t measurementType = SHT4x_MEASUREMENT_SLOW, bool errorCheck)
+bool SHT4x::read(uint8_t measurementType, bool errorCheck)
 {
   if (!requestData(measurementType))
   {
@@ -185,7 +185,7 @@ bool SHT4x::getSerialNumber(uint32_t &serial, bool errorCheck) {
 //
 //  PROTECTED
 //
-uint8_t SHT4x::getDelay()
+uint32_t SHT4x::getDelay()
 {
   //  table 5 datasheet
   switch(_lastMeasurementType)
@@ -259,4 +259,3 @@ bool SHT4x::readBytes(uint8_t n, uint8_t *val)
 
 
 //  -- END OF FILE --
-

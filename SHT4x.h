@@ -96,7 +96,7 @@ protected:
   uint8_t  _error;
 
 private:
-  uint8_t getDelay();
+  uint32_t getDelay();
   bool validateMeasCmd(uint8_t cmd)
   {
     return (cmd == SHT4x_MEASUREMENT_SLOW || cmd == SHT4x_MEASUREMENT_MEDIUM ||
@@ -113,5 +113,3 @@ private:
 
 
 //  -- END OF FILE --
-
-

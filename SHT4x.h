@@ -57,7 +57,7 @@ public:
   //  check sensor is reachable over I2C
   virtual bool isConnected();
 
-  //  blocks 15 milliseconds + actual read + math
+  //  blocks for the required time and read after
   bool read(uint8_t measurementType = SHT4x_MEASUREMENT_SLOW, bool errorCheck = true);
 
   //  lastRead is in milliSeconds since start

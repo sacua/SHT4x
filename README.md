@@ -16,13 +16,13 @@ Arduino library for the SHT4x temperature and humidity sensor.
 
 ## Description
 
-The SHT4x family of sensors should work up to 1 MHz I2C. **NOT VALIDATED!**
+The SHT4x family of sensors should work up to 1 MHz I2C.
 
 Accuracy table
 
 |  Sensor  |  Temperature   |  Humidity  |  Verified 
 |:--------:|:--------------:|:----------:|:----------:|
-|   SHT40  |      ~0.2°C    |     1.8%   |     N      |
+|   SHT40  |      ~0.2°C    |     1.8%   |     Y      |
 |   SHT41  |      ~0.2°C    |     1.8%   |     N      |
 |   SHT43  |      ISO Cal   |     1.8%   |     N      |
 |   SHT45  |      ~0.1°C    |     1.0%   |     N      |
@@ -140,17 +140,17 @@ any command as the error flag could be from a previous command.
 
 |  Error  |  Symbolic                     |  Description                   |
 |:-------:|:------------------------------|:-------------------------------|
-|  0x00   |  SHT31_OK                     |  no error                      |
-|  0x81   |  SHT31_ERR_WRITECMD           |  I2C write failed              |
-|  0x82   |  SHT31_ERR_READBYTES          |  I2C read failed               |
-|  0x83   |  SHT31_ERR_HEATER_OFF         |  Could not switch off heater   |
-|  0x84   |  SHT31_ERR_NOT_CONNECT        |  Could not connect             |
-|  0x85   |  SHT31_ERR_CRC_TEMP           |  CRC error in temperature      |
-|  0x86   |  SHT31_ERR_CRC_HUM            |  CRC error in humidity         |
-|  0x87   |  SHT31_ERR_CRC_STATUS         |  CRC error in status field     |
-|  0x88   |  SHT31_ERR_HEATER_COOLDOWN    |  Heater need to cool down      |
-|  0x89   |  SHT31_ERR_HEATER_ON          |  Could not switch on heater    |
-|  0x8A   |  SHT31_ERR_SERIAL_NUMBER_CRC  |  Could not switch on heater    |
+|  0x00   |  SHT4x_OK                     |  no error                      |
+|  0x81   |  SHT4x_ERR_WRITECMD           |  I2C write failed              |
+|  0x82   |  SHT4x_ERR_READBYTES          |  I2C read failed               |
+|  0x83   |  SHT4x_ERR_HEATER_OFF         |  Could not switch off heater   |
+|  0x84   |  SHT4x_ERR_NOT_CONNECT        |  Could not connect             |
+|  0x85   |  SHT4x_ERR_CRC_TEMP           |  CRC error in temperature      |
+|  0x86   |  SHT4x_ERR_CRC_HUM            |  CRC error in humidity         |
+|  0x87   |  SHT4x_ERR_CRC_STATUS         |  CRC error in status field     |
+|  0x88   |  SHT4x_ERR_HEATER_COOLDOWN    |  Heater need to cool down      |
+|  0x89   |  SHT4x_ERR_HEATER_ON          |  Could not switch on heater    |
+|  0x8A   |  SHT4x_ERR_SERIAL_NUMBER_CRC  |  Could not switch on heater    |
 
 ### Async interface
 

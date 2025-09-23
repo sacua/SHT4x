@@ -6,14 +6,14 @@
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
-#define SHT31_ADDRESS   0x44
+#define SHT_DEFAULT_ADDRESS   0x44
 
 uint32_t start;
 uint32_t stop;
 
-SHT31 sht(SHT31_ADDRESS);  //  uses explicit address
+SHT4x sht;  //  uses explicit address
 
 
 void setup()
@@ -22,18 +22,13 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
-  Serial.print("SHT31_LIB_VERSION: \t");
-  Serial.println(SHT31_LIB_VERSION);
+  Serial.print("SHT4x_LIB_VERSION: \t");
+  Serial.println(SHT4x_LIB_VERSION);
   Serial.println();
 
   Wire.begin();
   Wire.setClock(100000);
   sht.begin();
-
-  uint16_t stat = sht.readStatus();
-  Serial.print("STATUS:\t");
-  Serial.print(stat, HEX);
-  Serial.println();
 
   delay(100);
 
@@ -43,7 +38,7 @@ void setup()
   start = micros();
   b = sht.getSerialNumber(sn, true);
   stop = micros();
-  Serial.println("FAST:\ttrue");
+  Serial.println("CRC Check:\ttrue");
   Serial.print("TIME:\t");
   Serial.println(stop - start);
   if (b)
@@ -61,7 +56,7 @@ void setup()
   start = micros();
   b = sht.getSerialNumber(sn, false);
   stop = micros();
-  Serial.println("FAST:\tfalse");
+  Serial.println("CRC Check:\tfalse");
   Serial.print("TIME:\t");
   Serial.println(stop - start);
   if (b)

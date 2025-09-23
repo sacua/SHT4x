@@ -1,19 +1,19 @@
 //
-//    FILE: SHT31_I2Cspeed
+//    FILE: SHT31_demo.ino
 //  AUTHOR: Rob Tillaart
-// PURPOSE: testing the performance at different I2C speeds
+// PURPOSE: demo
 //     URL: https://github.com/RobTillaart/SHT31
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
-#define SHT31_ADDRESS   0x44
+#define SHT_DEFAULT_ADDRESS   0x44
 
 uint32_t start;
 uint32_t stop;
 
-SHT31 sht(SHT31_ADDRESS);
+SHT4x sht;
 
 
 void setup()
@@ -22,44 +22,29 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
-  Serial.print("SHT31_LIB_VERSION: \t");
-  Serial.println(SHT31_LIB_VERSION);
+  Serial.print("SHT4x_LIB_VERSION: \t");
+  Serial.println(SHT4x_LIB_VERSION);
   Serial.println();
 
   Wire.begin();
   Wire.setClock(100000);
   sht.begin();
-
-  uint16_t stat = sht.readStatus();
-  Serial.print(stat, HEX);
-  Serial.println();
 }
 
 
 void loop()
 {
-  for (uint32_t I2Cfreq = 100000; I2Cfreq < 900000; I2Cfreq += 50000)
-  {
-    Serial.print(I2Cfreq/1000);
-    Wire.setClock(I2Cfreq);
-    test();
-  }
-  Serial.println();
-}
-
-
-void test()
-{
   start = micros();
-  sht.read(true);         //  default = true/fast       slow = false
+  sht.read();         // default SHT4x_MEASUREMENT_SLOW and true for CRC check
   stop = micros();
+
   Serial.print("\t");
   Serial.print(stop - start);
   Serial.print("\t");
   Serial.print(sht.getTemperature(), 1);
   Serial.print("\t");
   Serial.println(sht.getHumidity(), 1);
-  delay(1000);
+  delay(100);
 }
 
 

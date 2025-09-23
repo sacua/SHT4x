@@ -6,14 +6,14 @@
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
-#define SHT31_ADDRESS   0x44
+#define SHT_DEFAULT_ADDRESS   0x44
 
 uint32_t start;
 uint32_t stop;
 
-SHT31 sht;
+SHT4x sht;
 
 
 void setup()
@@ -36,7 +36,7 @@ void setup()
 
 void loop()
 {
-  sht.read(false);         //  default = true/fast       slow = false
+  sht.read(true);         //  default = true/CRC Check
 
   Serial.println(sht.getTemperature(), 2);
 //  Serial.print("\t");

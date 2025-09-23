@@ -6,14 +6,14 @@
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
-#define SHT31_ADDRESS   0x44
+#define SHT_DEFAULT_ADDRESS   0x44
 
 uint32_t start;
 uint32_t stop;
 
-SHT31 sht;  //  use default address and Wire
+SHT4x sht;  //  use default address and Wire
 
 uint32_t connectionFails = 0;
 
@@ -24,17 +24,13 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
-  Serial.print("SHT31_LIB_VERSION: \t");
-  Serial.println(SHT31_LIB_VERSION);
+  Serial.print("SHT4x_LIB_VERSION: \t");
+  Serial.println(SHT4x_LIB_VERSION);
   Serial.println();
 
   Wire.begin();
   Wire.setClock(100000);
   sht.begin();
-
-  uint16_t stat = sht.readStatus();
-  Serial.print(stat, HEX);
-  Serial.println();
 }
 
 
@@ -43,11 +39,10 @@ void loop()
   if ( sht.isConnected()  )
   {
     start = micros();
-    bool b = sht.read();         //  default = true/fast       slow = false
+    bool b = sht.read();         //  default = true/CRC check       no crc check = false
     stop = micros();
 
     int error = sht.getError();
-    uint16_t stat = sht.readStatus();
 
     Serial.print(millis());
     Serial.print("\t");
@@ -56,8 +51,6 @@ void loop()
     Serial.print(b, HEX);
     Serial.print("\t");
     Serial.print(error, HEX);
-    Serial.print("\t");
-    Serial.print(stat, HEX);
     Serial.print("\t");
     Serial.print(sht.getTemperature(), 1);
     Serial.print("\t");

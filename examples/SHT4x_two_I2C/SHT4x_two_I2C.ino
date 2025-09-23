@@ -9,7 +9,7 @@
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
 
 // TwoWire myWire(&sercom5, 0, 1);
@@ -17,16 +17,16 @@ TwoWire myWire = Wire1;       //  test.
 
 
 // note: address reuse on second I2C bus
-#define SHT31_ADDRESS_1   0x44
-#define SHT31_ADDRESS_2   0x45
-#define SHT31_ADDRESS_3   0x44
-#define SHT31_ADDRESS_4   0x45
+#define SHT4x_ADDRESS_1   0x44
+#define SHT4x_ADDRESS_2   0x45
+#define SHT4x_ADDRESS_3   0x44
+#define SHT4x_ADDRESS_4   0x45
 
 
-SHT31 sht_1(SHT31_ADDRESS_1, &Wire);
-SHT31 sht_2(SHT31_ADDRESS_2, &Wire);
-SHT31 sht_3(SHT31_ADDRESS_3, &myWire);
-SHT31 sht_4(SHT31_ADDRESS_4, &myWire);
+SHT4x sht_1(SHT4x_ADDRESS_1, &Wire);
+SHT4x sht_2(SHT4x_ADDRESS_2, &Wire);
+SHT4x sht_3(SHT4x_ADDRESS_3, &myWire);
+SHT4x sht_4(SHT4x_ADDRESS_4, &myWire);
 
 
 bool b1, b2, b3, b4;
@@ -38,8 +38,8 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
-  Serial.print("SHT31_LIB_VERSION: \t");
-  Serial.println(SHT31_LIB_VERSION);
+  Serial.print("SHT4x_LIB_VERSION: \t");
+  Serial.println(SHT4x_LIB_VERSION);
   Serial.println();
 
   Wire.begin();
@@ -72,11 +72,17 @@ void setup()
 
 void loop()
 {
-  //  read all sensors that are found
-  if (b1) sht_1.read();
-  if (b2) sht_2.read();
-  if (b3) sht_3.read();
-  if (b4) sht_4.read();
+  //  request data on all sensors that are found
+  if (b1) sht_1.requestData();
+  if (b2) sht_2.requestData();
+  if (b3) sht_3.requestData();
+  if (b4) sht_4.requestData();
+
+  // wait for all data to be ready
+  if (b1) while(!sht_1.dataReady()) yield();
+  if (b2) while(!sht_2.dataReady()) yield();
+  if (b3) while(!sht_3.dataReady()) yield();
+  if (b4) while(!sht_4.dataReady()) yield();
 
   Serial.print(sht_1.getTemperature(), 1);
   Serial.print("\t");

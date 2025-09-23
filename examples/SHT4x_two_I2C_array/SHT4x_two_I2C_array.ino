@@ -10,18 +10,18 @@
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
 
 TwoWire myWire(&sercom5, 0, 1);
 //  TwoWire myWire = Wire1;
 
 
-SHT31 sht[4] = {
-  SHT31(0x44, &Wire),
-  SHT31(0x45, &Wire),
-  SHT31(0x44, &myWire),
-  SHT31(0x45, &myWire)
+SHT4x sht[4] = {
+  SHT4x(0x44, &Wire),
+  SHT4x(0x45, &Wire),
+  SHT4x(0x44, &myWire),
+  SHT4x(0x45, &myWire)
 };
 
 bool b[4];
@@ -33,8 +33,8 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
-  Serial.print("SHT31_LIB_VERSION: \t");
-  Serial.println(SHT31_LIB_VERSION);
+  Serial.print("SHT4x_LIB_VERSION: \t");
+  Serial.println(SHT4x_LIB_VERSION);
   Serial.println();
 
   Wire.begin();
@@ -60,10 +60,16 @@ void setup()
 
 void loop()
 {
-  //  read all that are found
+  //  request data on all that are found
   for (uint8_t i = 0; i < 4; i++)
   {
-    if (b[i]) sht[i].read();
+    if (b[i]) sht[i].requestData();
+  }
+
+  // wait for all data to be ready
+  for (uint8_t i = 0; i < 4; i++)
+  {
+    if (b[i]) while(!sht[i].dataReady()) yield();
   }
 
   for (uint8_t i = 0; i < 4; i++)

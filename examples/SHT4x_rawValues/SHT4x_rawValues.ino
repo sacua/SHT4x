@@ -6,15 +6,15 @@
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
-#define SHT31_ADDRESS   0x44
+#define SHT_DEFAULT_ADDRESS   0x44
 
 uint32_t start;
 uint32_t stop;
 uint32_t cnt;
 
-SHT31 sht(SHT31_ADDRESS);  //  uses explicit address
+SHT4x sht(SHT_DEFAULT_ADDRESS);  //  uses explicit address
 
 
 void setup()
@@ -23,17 +23,13 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
-  Serial.print("SHT31_LIB_VERSION: \t");
-  Serial.println(SHT31_LIB_VERSION);
+  Serial.print("SHT4x_LIB_VERSION: \t");
+  Serial.println(SHT4x_LIB_VERSION);
   Serial.println();
 
   Wire.begin();
   Wire.setClock(100000);
   sht.begin();
-
-  uint16_t stat = sht.readStatus();
-  Serial.print(stat, HEX);
-  Serial.println();
 
   sht.requestData();
   cnt = 0;
@@ -48,7 +44,7 @@ void loop()
   if (sht.dataReady())
   {
     start = micros();
-    bool success  = sht.readData();   //  default = true = fast
+    bool success  = sht.readData();   //  default = true = CRC Check
     stop = micros();
     sht.requestData();                //  request for next sample
 
@@ -66,14 +62,14 @@ void loop()
       Serial.print(rawTemperature, HEX);
       Serial.print(" = ");
 
-      //  This formula comes from page 14 of the SHT31 datasheet
+      //  This formula comes from page 12 of the SHT4x datasheet
       Serial.print(rawTemperature * (175.0 / 65535) - 45, 1);
       Serial.print("°C\t");
       Serial.print(sht.getRawHumidity(), HEX);
       Serial.print(" = ");
 
-      //  This formula comes from page 14 of the SHT31 datasheet
-      Serial.print(rawHumidity * (100.0 / 65535), 1);
+      //  This formula comes from page 12 of the SHT4x datasheet
+      Serial.print(rawHumidity * (125.0 / 65535) - 6, 1);
       Serial.print("%\t");
       Serial.println(cnt);
       cnt = 0;

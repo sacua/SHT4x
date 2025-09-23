@@ -1,19 +1,19 @@
 //
-//    FILE: SHT31_slowRead.ino
+//    FILE: SHT31_lastRead.ino
 //  AUTHOR: Rob Tillaart
-// PURPOSE: demo
+// PURPOSE: demo lastRead
 //     URL: https://github.com/RobTillaart/SHT31
 
 
 #include "Wire.h"
-#include "SHT31.h"
+#include "SHT4x.h"
 
-#define SHT31_ADDRESS   0x44
+#define SHT_DEFAULT_ADDRESS   0x44
 
 uint32_t start;
 uint32_t stop;
 
-SHT31 sht;
+SHT4x sht(SHT_DEFAULT_ADDRESS, &Wire);  //  use explicit address and Wire
 
 
 void setup()
@@ -29,21 +29,14 @@ void setup()
   Wire.begin();
   Wire.setClock(100000);
   sht.begin();
-
-  uint16_t stat = sht.readStatus();
-  Serial.print(stat, HEX);
-  Serial.println();
-  delay(100);
 }
 
 
 void loop()
 {
-  start = micros();
-  sht.read(false);         //  default = true/fast       slow = false
-  stop = micros();
+  sht.read();         //  default = true/CRC check       no crc check = false
   Serial.print("\t");
-  Serial.print(stop - start);
+  Serial.print(sht.lastRead());
   Serial.print("\t");
   Serial.print(sht.getTemperature(), 1);
   Serial.print("\t");
